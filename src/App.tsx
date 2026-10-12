@@ -159,11 +159,6 @@ export default function App() {
         </div>}
         <div className={`workspace ${showSetup ? (showProgressPanel ? "workspace-active" : "workspace-initial") : "workspace-focused"}`}>
           {showSetup && <section className="card left" aria-label="Configuração do processamento">
-            <div className="setup-header">
-              <span className="setup-eyebrow">PAINEL DE CRIAÇÃO</span>
-              <h2>Prepare sua nova mídia</h2>
-              <p>Escolha o arquivo, ajuste as opções e gere uma nova versão em poucos passos.</p>
-            </div>
             <div className="section-head"><div><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
             {!media ? (
               <label className={`drop ${dragging ? "dragging" : ""}`}

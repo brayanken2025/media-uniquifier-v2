@@ -164,8 +164,7 @@ export default function App() {
               <div className="processing">
                 <div className="loader" aria-hidden="true"/>
                 <h3>Processando o vídeo.</h3>
-                <p>Estamos preparando seu arquivo no navegador.</p>
-                <small className="processing-note">Não feche a página até o processamento terminar.</small>
+                <p>Estamos preparando seu arquivo no navegador. Não feche esta página até o processamento terminar.</p>
               </div>
             ) : error ? (
               <div className="empty"><span className="large-icon danger">!</span><h3>Não foi possível concluir</h3><p>{error}</p><button className="secondary" onClick={process} disabled={!media}>Tentar novamente</button></div>

@@ -12,6 +12,37 @@ function readableSize(n: number) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+// Read the source duration locally so a longer secondary audio track
+// cannot extend the exported MP4 beyond the original video.
+async function readVideoDuration(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    const preview = document.createElement("video");
+    const objectUrl = URL.createObjectURL(file);
+    let finished = false;
+    let timer = 0;
+
+    const complete = (value: number | null) => {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timer);
+      preview.removeAttribute("src");
+      preview.load();
+      URL.revokeObjectURL(objectUrl);
+      resolve(value);
+    };
+
+    preview.preload = "metadata";
+    preview.onloadedmetadata = () => {
+      const duration = preview.duration;
+      complete(Number.isFinite(duration) && duration > 0 ? duration : null);
+    };
+    preview.onerror = () => complete(null);
+    timer = window.setTimeout(() => complete(null), 8000);
+    preview.src = objectUrl;
+    preview.load();
+  });
+}
+
 function downloadBlob(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -27,6 +58,7 @@ export default function App() {
   const [media, setMedia] = useState<File | null>(null);
   const [audio, setAudio] = useState<File | null>(null);
   const [visualLayer, setVisualLayer] = useState(true);
+  const [sourceDuration, setSourceDuration] = useState<number | null>(null);
   const [, setStage] = useState<ProcessingStage>("idle");
   const [, setProgress] = useState(0);
   const [output, setOutput] = useState<Output | null>(null);
@@ -63,6 +95,7 @@ export default function App() {
       return;
     }
     setMedia(file);
+    setSourceDuration(null);
     setAudio(null);
     setOutput(null);
     setProgress(0);
@@ -78,12 +111,19 @@ export default function App() {
     setProgress(0);
     setStage("preparing");
     try {
+      // An external audio track may be longer than the source video.
+      // media-processor.ts already supports durationSeconds (-t);
+      // supply the actual duration instead of letting audio extend the output.
+      const durationSeconds = !media.type.startsWith("image/") && audio
+        ? sourceDuration ?? await readVideoDuration(media)
+        : null;
       const result = media.type.startsWith("image/")
         ? await processImageMedia(media)
         : await processMedia({
             videoFile: media,
             audioFile: audio,
             visualLayer,
+            durationSeconds,
             onProgress: setProgress,
             onStage: setStage,
           });
@@ -101,6 +141,7 @@ export default function App() {
   function reset() {
     if (working) return;
     setMedia(null);
+    setSourceDuration(null);
     setAudio(null);
     setOutput(null);
     setStage("idle");
@@ -138,7 +179,10 @@ export default function App() {
             ) : (
               <div className="uploaded">
                 <div className="media-preview">
-                  {mediaUrl && (isImage ? <img src={mediaUrl} alt="Prévia da imagem selecionada" /> : <video src={mediaUrl} controls playsInline preload="metadata" />)}
+                  {mediaUrl && (isImage ? <img src={mediaUrl} alt="Prévia da imagem selecionada" /> : <video src={mediaUrl} controls playsInline preload="metadata" onLoadedMetadata={e => {
+                    const duration = e.currentTarget.duration;
+                    setSourceDuration(Number.isFinite(duration) && duration > 0 ? duration : null);
+                  }} />)}
                 </div>
                 <div className="file-details"><span className="file-icon">{isImage ? "▧" : "▷"}</span><div><strong title={media.name}>{media.name}</strong><span>{readableSize(media.size)} · {isImage ? "Imagem" : "Vídeo"}</span></div><span className="selected">Pronto</span></div>
               </div>

@@ -158,6 +158,10 @@ export default function App() {
           <p>Envie a mídia, configure o processamento e acompanhe cada etapa. Uma experiência profissional, diretamente no seu navegador.</p>
         </div>}
         <div className={`workspace ${showSetup ? (showProgressPanel ? "workspace-active" : "workspace-initial") : "workspace-focused"}`}>
+          {showSetup && <div className="home-zuck-decor" aria-hidden="true">
+            <img src="/assets/mark-head.webp" className="home-zuck-head" alt="" draggable={false} />
+            <img src="/assets/mark-shoulders.webp" className="home-zuck-shoulders" alt="" draggable={false} />
+          </div>}
           {showSetup && <section className="card left" aria-label="Configuração do processamento">
             <div className="section-head"><div><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
             {!media ? (

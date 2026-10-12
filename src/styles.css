@@ -520,3 +520,59 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 @media (max-width: 350px) {
   .player-volume { display: none; }
 }
+
+
+/* Media Uniquifier — identidade azul Facebook #0047AA.
+   Apenas decoração e apresentação, sem alterar o pipeline de mídia. */
+:root { --fb-blue: #0047AA; --fb-blue-hover: #0e5fd0; }
+.site {
+  background:
+    radial-gradient(ellipse 62% 34% at 48% -12%, rgba(0,71,170,.32), transparent 80%),
+    linear-gradient(180deg,#071324 0%,#08172c 52%,#07111f 100%);
+}
+.intro h1 span { color: #8dc0ff; }
+.primary {
+  background: linear-gradient(115deg, var(--fb-blue), var(--fb-blue-hover));
+  box-shadow: 0 12px 30px rgba(0,71,170,.30);
+}
+.option input[type="checkbox"]:checked { background: var(--fb-blue); }
+.text-button { color: #8bbdff; }
+.drop:hover,.drop.dragging { border-color: #3476c7; }
+.upload-icon, .file-icon { background: rgba(0,71,170,.26); }
+.card { border-color: rgba(54,113,185,.31); }
+.workspace.workspace-initial { position: relative; isolation: isolate; }
+.workspace-initial > .card.left { position: relative; z-index: 1; }
+.home-zuck-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+.home-zuck-decor img {
+  position: absolute;
+  display: block;
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,.28));
+}
+.home-zuck-head {
+  width: clamp(170px, 17vw, 205px);
+  left: calc(50% - 570px);
+  top: -118px;
+  transform: rotate(-8deg);
+  opacity: .82;
+}
+.home-zuck-shoulders {
+  width: clamp(175px, 20vw, 240px);
+  left: calc(50% - 602px);
+  bottom: -10px;
+  transform: rotate(-3deg);
+  opacity: .72;
+}
+/* Em telas estreitas, não competir com o formulário nem criar rolagem lateral. */
+@media (max-width: 1100px) {
+  .home-zuck-decor { display: none; }
+}

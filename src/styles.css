@@ -565,7 +565,15 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
   border-color: rgba(102,169,255,.34);
   box-shadow: 0 22px 75px rgba(0,24,79,.38), 0 0 0 1px rgba(255,255,255,.035) inset;
 }
-.site-home .footer { color: rgba(230,241,255,.8); }
+.site-home .footer {
+  position: relative;
+  margin: 28px 0 0;
+  padding: 19px 16px 26px;
+  color: rgba(236,246,255,.94);
+  background: linear-gradient(180deg, rgba(126,193,255,.11) 0%, rgba(0,71,170,.045) 100%);
+  border-top: 1px solid rgba(214,235,255,.23);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
 
 /* Both portraits stay in the free side gutters of the creation card.
    The shoulder image ends within the composition; bottom alpha fading
@@ -591,7 +599,7 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 }
 .site-home .home-zuck-head {
   width: clamp(188px, 17vw, 226px);
-  left: calc(50% - 536px);
+  left: calc(50% - 620px);
   top: -112px;
   transform: rotate(-7deg);
   opacity: 1;
@@ -599,7 +607,7 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 .site-home .home-zuck-shoulders {
   width: clamp(215px, 19vw, 252px);
   left: auto;
-  right: 4px;
+  right: 32px;
   bottom: 12px;
   transform: rotate(3deg);
   opacity: 1;
@@ -611,12 +619,12 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 @media (max-width: 1190px) and (min-width: 901px) {
   .site-home .home-zuck-head {
     width: clamp(142px, 16vw, 188px);
-    left: 0;
+    left: -22px;
     top: -90px;
   }
   .site-home .home-zuck-shoulders {
     width: clamp(150px, 17vw, 208px);
-    right: 0;
+    right: 22px;
     bottom: 22px;
   }
 }

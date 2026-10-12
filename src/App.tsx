@@ -7,16 +7,6 @@ import {
 } from "./lib/media-processor";
 
 type Output = { blob: Blob; fileName: string; diagnostics: ProcessingDiagnostics };
-const labels: Record<ProcessingStage, string> = {
-  idle: "Pronto para começar",
-  preparing: "Preparando o arquivo",
-  "loading-engine": "Carregando motor de vídeo",
-  "writing-files": "Preparando as mídias",
-  encoding: "Processando o vídeo",
-  done: "Processamento concluído",
-  error: "Ocorreu um erro",
-};
-
 function readableSize(n: number) {
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
@@ -37,8 +27,8 @@ export default function App() {
   const [media, setMedia] = useState<File | null>(null);
   const [audio, setAudio] = useState<File | null>(null);
   const [visualLayer, setVisualLayer] = useState(true);
-  const [stage, setStage] = useState<ProcessingStage>("idle");
-  const [progress, setProgress] = useState(0);
+  const [, setStage] = useState<ProcessingStage>("idle");
+  const [, setProgress] = useState(0);
   const [output, setOutput] = useState<Output | null>(null);
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
@@ -120,22 +110,11 @@ export default function App() {
 
   return (
     <div className="site">
-      <header className="header">
-        <div className="container header-inner">
-          <div className="brand"><span className="brand-mark">M</span><span>MEDIA <b>UNIQUIFIER</b></span></div>
-          <span className="status"><span className="status-dot"/> Processamento local no navegador</span>
-        </div>
-      </header>
       <main className={`container main ${showSetup ? "" : "main-focused"}`}>
         {showSetup && <div className="intro">
           <span className="eyebrow">ESTÚDIO DE MÍDIA</span>
           <h1>Seu conteúdo, <span>seu controle.</span></h1>
           <p>Envie a mídia, configure o processamento e acompanhe cada etapa. Uma experiência profissional, diretamente no seu navegador.</p>
-          <div className="hero-features" aria-label="Destaques da ferramenta">
-            <span>Vídeos e imagens</span>
-            <span>Processamento local</span>
-            <span>Download direto</span>
-          </div>
         </div>}
         <div className={`workspace ${showSetup ? (showProgressPanel ? "workspace-active" : "workspace-initial") : "workspace-focused"}`}>
           {showSetup && <section className="card left" aria-label="Configuração do processamento">
@@ -143,11 +122,6 @@ export default function App() {
               <span className="setup-eyebrow">PAINEL DE CRIAÇÃO</span>
               <h2>Prepare sua nova mídia</h2>
               <p>Escolha o arquivo, ajuste as opções e gere uma nova versão em poucos passos.</p>
-            </div>
-            <div className="setup-guide" aria-label="Como utilizar">
-              <span><b>01</b> Envie</span>
-              <span><b>02</b> Configure</span>
-              <span><b>03</b> Processe</span>
             </div>
             <div className="section-head"><div><span className="step">01</span><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
             {!media ? (
@@ -184,24 +158,15 @@ export default function App() {
             <button className="primary" type="button" disabled={!media || working} onClick={process}>{working ? "Processando mídia…" : "Gerar nova mídia"} <span>{working ? "◌" : "→"}</span></button>
             <p className="support-text">Arquivos grandes podem demorar e exigem memória disponível no dispositivo. Não feche esta aba durante o processamento.</p>
           </section>}
-          {showProgressPanel && <section className="card right" aria-live="polite" aria-label="Acompanhamento e resultado">
-            <div className="section-head"><div><span className="step">03</span><h2>{working ? "Acompanhamento" : error ? "Status do processamento" : "Resultado"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>
+          {showProgressPanel && <section className={working ? "processing-only" : "card right"} aria-live="polite" aria-label={working ? "Processamento em andamento" : "Resultado do processamento"}>
+            {!working && <div className="section-head"><div><span className="step">03</span><h2>{error ? "Status do processamento" : "Resultado"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>}
             {working ? (
               <div className="processing">
-                  <div className="loader" aria-hidden="true"/>
-                  <span className="processing-label">PROCESSAMENTO EM ANDAMENTO</span>
-                  <h3>{labels[stage]}</h3>
-                  <p>Estamos preparando seu arquivo no navegador. Você pode acompanhar o progresso abaixo.</p>
-                  <div className="progress-heading"><span>Progresso da tarefa</span><strong>{Math.round(progress * 100)}%</strong></div>
-                  <div className="meter" role="progressbar" aria-label="Progresso do processamento" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}><div style={{width: `${Math.round(progress * 100)}%`}}/></div>
-                  <div className="processing-steps" aria-label="Etapas da tarefa">
-                    <span className={stage === "preparing" ? "is-current" : ""}>Preparação</span>
-                    <span className={stage === "loading-engine" ? "is-current" : ""}>Carregamento</span>
-                    <span className={stage === "writing-files" ? "is-current" : ""}>Organização</span>
-                    <span className={stage === "encoding" ? "is-current" : ""}>Renderização</span>
-                  </div>
-                  <small className="processing-note">Não feche a página até que o processamento termine.</small>
-                </div>
+                <div className="loader" aria-hidden="true"/>
+                <h3>Processando o vídeo.</h3>
+                <p>Estamos preparando seu arquivo no navegador.</p>
+                <small className="processing-note">Não feche a página até o processamento terminar.</small>
+              </div>
             ) : error ? (
               <div className="empty"><span className="large-icon danger">!</span><h3>Não foi possível concluir</h3><p>{error}</p><button className="secondary" onClick={process} disabled={!media}>Tentar novamente</button></div>
             ) : output ? (

@@ -308,3 +308,45 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
     max-height: min(74dvh, 720px);
   }
 }
+
+
+/* Processamento: tela limpa, sem card ou controles de progresso visíveis. */
+.processing-only {
+  width: 100%;
+  min-height: min(78dvh, 740px);
+  display: grid;
+  place-items: center;
+}
+.processing-only .processing {
+  width: 100%;
+  min-height: 0;
+  flex: none;
+  padding: 34px 16px;
+  justify-content: center;
+  text-align: center;
+}
+.processing-only .processing .loader {
+  margin: 0 auto 24px;
+}
+.processing-only .processing h3 {
+  margin: 0 0 10px;
+  font-size: clamp(21px, 3.2vw, 27px);
+  line-height: 1.3;
+  text-wrap: balance;
+}
+.processing-only .processing p {
+  max-width: 460px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.processing-only .processing-note {
+  display: block;
+  margin-top: 28px;
+  color: #93afd4;
+  font-size: 13px;
+  line-height: 1.6;
+}
+@media (max-width: 600px) {
+  .processing-only { min-height: min(76dvh, 650px); }
+  .processing-only .processing { padding: 24px 5px; }
+}

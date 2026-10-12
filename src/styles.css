@@ -639,3 +639,48 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
   }
   .site-home::before { opacity: .2; }
 }
+
+
+/* Processing-only visual theme. The FFmpeg pipeline and loading markup stay
+   exactly as they were; only the background changes while working is true. */
+.site.site-processing {
+  min-height: 100dvh;
+  background-color: #03183f;
+  background-image:
+    linear-gradient(180deg, rgba(0, 26, 81, .12), rgba(0, 11, 38, .34)),
+    url("/assets/mark-processing-background.webp");
+  background-position: center, center;
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+}
+.site-processing .main.main-focused {
+  min-height: 100dvh;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.site-processing .workspace.workspace-focused {
+  width: 100%;
+}
+.site-processing .processing-only .processing h3 {
+  color: #f2f7ff;
+  text-shadow: 0 2px 17px rgba(0, 15, 55, .28);
+}
+.site-processing .processing-only .processing p {
+  color: #c8e0ff;
+  text-shadow: 0 1px 12px rgba(0, 15, 55, .3);
+}
+.site-processing .processing-only .processing .loader {
+  border-color: rgba(166, 202, 251, .25);
+  border-top-color: #83c2ff;
+}
+@media (max-width: 700px) {
+  .site.site-processing {
+    background-image:
+      linear-gradient(180deg, rgba(0, 25, 72, .47), rgba(0, 11, 38, .68)),
+      url("/assets/mark-processing-background.webp");
+    background-position: center, 70% center;
+  }
+}

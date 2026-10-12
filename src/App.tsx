@@ -151,7 +151,7 @@ export default function App() {
   }
 
   return (
-    <div className={showSetup ? "site site-home" : "site"}>
+    <div className={showSetup ? "site site-home" : working ? "site site-processing" : "site"}>
       <main className={`container main ${showSetup ? "" : "main-focused"}`}>
         {showSetup && <div className="intro">
           <h1>Seu conteúdo, <span>seu controle.</span></h1>

@@ -641,46 +641,93 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 }
 
 
-/* Processing-only visual theme. The FFmpeg pipeline and loading markup stay
-   exactly as they were; only the background changes while working is true. */
+/* Processing-only visual theme — matched to the user's 1820 × 864
+   screenshot. Artwork excludes static typography/spinner: both stay live
+   browser elements, with FFmpeg, upload and result logic unchanged. */
 .site.site-processing {
   min-height: 100dvh;
   background-color: #03183f;
-  background-image:
-    linear-gradient(180deg, rgba(0, 26, 81, .12), rgba(0, 11, 38, .34)),
-    url("/assets/mark-processing-background.webp");
-  background-position: center, center;
-  background-size: cover, cover;
-  background-repeat: no-repeat, no-repeat;
+  background-image: url("/assets/mark-processing-background.webp");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 .site-processing .main.main-focused {
+  width: 100%;
+  max-width: none;
   min-height: 100dvh;
-  padding-top: 0;
-  padding-bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
 }
 .site-processing .workspace.workspace-focused {
+  display: grid;
   width: 100%;
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+}
+.site-processing .processing-only {
+  width: min(100%, 920px);
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+.site-processing .processing-only .processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: min(600px, 100%);
+  min-height: 0;
+  padding: 0 16px;
+  text-align: center;
+  transform: translateY(-42px);
+}
+.site-processing .processing-only .processing .loader {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 32px;
+  border: 4px solid rgba(166, 202, 251, .25);
+  border-top-color: #83c2ff;
 }
 .site-processing .processing-only .processing h3 {
+  margin: 0 0 14px;
   color: #f2f7ff;
+  font-size: clamp(23px, 2.1vw, 30px);
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -.03em;
   text-shadow: 0 2px 17px rgba(0, 15, 55, .28);
 }
 .site-processing .processing-only .processing p {
-  color: #c8e0ff;
+  max-width: 540px;
+  margin: 0;
+  color: #d6e8ff;
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.65;
+  text-wrap: pretty;
   text-shadow: 0 1px 12px rgba(0, 15, 55, .3);
 }
-.site-processing .processing-only .processing .loader {
-  border-color: rgba(166, 202, 251, .25);
-  border-top-color: #83c2ff;
+@media (max-width: 850px) {
+  .site.site-processing { background-position: 63% center; }
+  .site-processing .processing-only .processing { transform: translateY(-18px); }
 }
-@media (max-width: 700px) {
-  .site.site-processing {
-    background-image:
-      linear-gradient(180deg, rgba(0, 25, 72, .47), rgba(0, 11, 38, .68)),
-      url("/assets/mark-processing-background.webp");
-    background-position: center, 70% center;
+@media (max-width: 600px) {
+  .site.site-processing { background-position: 67% center; }
+  .site.site-processing::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 17, 60, .28);
+    pointer-events: none;
+  }
+  .site-processing .main.main-focused { position: relative; z-index: 1; }
+  .site-processing .processing-only .processing {
+    width: 100%;
+    padding: 0 20px;
+    transform: translateY(-14px);
   }
 }

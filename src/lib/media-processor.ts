@@ -84,17 +84,13 @@ function safeExtension(file: File, fallback: string) {
 }
 
 function createProcessingId() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-
-  const bytes = new Uint8Array(16);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return crypto.randomUUID();
 }
 
 async function sha256Hex(bytes: Uint8Array) {
-  const buffer = await crypto.subtle.digest("SHA-256", bytes);
+  const digestInput = new Uint8Array(bytes.byteLength);
+  digestInput.set(bytes);
+  const buffer = await crypto.subtle.digest("SHA-256", digestInput.buffer);
   return Array.from(new Uint8Array(buffer), (byte) =>
     byte.toString(16).padStart(2, "0"),
   ).join("");

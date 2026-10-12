@@ -48,6 +48,9 @@ export default function App() {
   const isImage = Boolean(media?.type.startsWith("image/"));
   const outputIsImage = Boolean(output?.blob.type.startsWith("image/"));
   const showProgressPanel = working || Boolean(error) || Boolean(output);
+  // Only the setup experience is visible before a task starts, or after an error.
+  // While processing and after success, render one focused card at a time.
+  const showSetup = !working && !output;
 
   useEffect(() => {
     if (!media) { setMediaUrl(""); return; }
@@ -123,8 +126,8 @@ export default function App() {
           <span className="status"><span className="status-dot"/> Processamento local no navegador</span>
         </div>
       </header>
-      <main className="container main">
-        <div className="intro">
+      <main className={`container main ${showSetup ? "" : "main-focused"}`}>
+        {showSetup && <div className="intro">
           <span className="eyebrow">ESTÚDIO DE MÍDIA</span>
           <h1>Seu conteúdo, <span>seu controle.</span></h1>
           <p>Envie a mídia, configure o processamento e acompanhe cada etapa. Uma experiência profissional, diretamente no seu navegador.</p>
@@ -133,9 +136,9 @@ export default function App() {
             <span>Processamento local</span>
             <span>Download direto</span>
           </div>
-        </div>
-        <div className={`workspace ${showProgressPanel ? "workspace-active" : "workspace-initial"}`}>
-          <section className="card left" aria-label="Configuração do processamento">
+        </div>}
+        <div className={`workspace ${showSetup ? (showProgressPanel ? "workspace-active" : "workspace-initial") : "workspace-focused"}`}>
+          {showSetup && <section className="card left" aria-label="Configuração do processamento">
             <div className="setup-header">
               <span className="setup-eyebrow">PAINEL DE CRIAÇÃO</span>
               <h2>Prepare sua nova mídia</h2>
@@ -180,7 +183,7 @@ export default function App() {
             {audio && !isImage && <div className="audio-added"><span>♫</span><span title={audio.name}>{audio.name} · {readableSize(audio.size)}</span><button disabled={working} onClick={() => setAudio(null)} aria-label="Remover áudio">×</button></div>}
             <button className="primary" type="button" disabled={!media || working} onClick={process}>{working ? "Processando mídia…" : "Gerar nova mídia"} <span>{working ? "◌" : "→"}</span></button>
             <p className="support-text">Arquivos grandes podem demorar e exigem memória disponível no dispositivo. Não feche esta aba durante o processamento.</p>
-          </section>
+          </section>}
           {showProgressPanel && <section className="card right" aria-live="polite" aria-label="Acompanhamento e resultado">
             <div className="section-head"><div><span className="step">03</span><h2>{working ? "Acompanhamento" : error ? "Status do processamento" : "Resultado"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>
             {working ? (
@@ -214,7 +217,7 @@ export default function App() {
             )}
           </section>}
         </div>
-        <footer className="footer">MEDIA UNIQUIFIER · Processamento de mídia no dispositivo · Nenhum arquivo enviado ao servidor</footer>
+        {showSetup && <footer className="footer">MEDIA UNIQUIFIER · Processamento de mídia no dispositivo · Nenhum arquivo enviado ao servidor</footer>}
       </main>
     </div>
   );

@@ -1,17 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildVisualProcessingAttemptFilters,
   buildVisualProcessingFallbackFilter,
   buildVisualProcessingFilter,
+  buildVisualProcessingWasmSafeFilter,
   composeVideoFilter,
   resolveVisualProcessingConfig,
 } from "./visual-processing";
 
 describe("visual processing", () => {
-  it("uses production-safe defaults", () => {
+  it("uses hardened production defaults", () => {
     expect(resolveVisualProcessingConfig()).toEqual({
       enabled: true,
-      strength: 1,
+      strength: 1.15,
       overlayEnabled: false,
       overlayText: "PROTECTED",
       maxFrames: null,
@@ -26,7 +28,7 @@ describe("visual processing", () => {
 
     expect(
       resolveVisualProcessingConfig({ VITE_VISUAL_PROC_STRENGTH: "9" }).strength,
-    ).toBe(1.5);
+    ).toBe(2);
 
     expect(
       resolveVisualProcessingConfig({ VITE_VISUAL_PROC_MAX_FRAMES: "45" }).maxFrames,
@@ -39,10 +41,12 @@ describe("visual processing", () => {
     });
 
     expect(buildVisualProcessingFilter(config)).toBeNull();
+    expect(buildVisualProcessingWasmSafeFilter(config)).toBeNull();
     expect(buildVisualProcessingFallbackFilter(config)).toBeNull();
+    expect(buildVisualProcessingAttemptFilters(config)).toEqual([]);
   });
 
-  it("applies multi-layer anti-OCR / anti-CV filters scaled by strength", () => {
+  it("builds a full multi-layer anti-OCR chain scaled by strength", () => {
     const light = buildVisualProcessingFilter(
       resolveVisualProcessingConfig({ VITE_VISUAL_PROC_STRENGTH: "0.5" }),
     );
@@ -57,7 +61,33 @@ describe("visual processing", () => {
     expect(light).toContain("hue=");
     expect(light).toContain("chromashift=");
     expect(light).toContain("unsharp=");
+    expect((light!.match(/noise=/g) || []).length).toBeGreaterThanOrEqual(2);
     expect(light).not.toBe(strong);
+  });
+
+  it("builds a WASM-safe chain without exotic filters", () => {
+    const filter = buildVisualProcessingWasmSafeFilter(
+      resolveVisualProcessingConfig({ VITE_VISUAL_PROC_STRENGTH: "1.2" }),
+    );
+
+    expect(filter).toContain("eq=");
+    expect(filter).toContain("hue=");
+    expect(filter).toContain("noise=");
+    expect(filter).toContain("unsharp=");
+    expect(filter).not.toContain("geq=");
+    expect(filter).not.toContain("lenscorrection=");
+    expect(filter).not.toContain("chromashift=");
+  });
+
+  it("orders protection tiers full → wasm-safe → fallback", () => {
+    const tiers = buildVisualProcessingAttemptFilters(
+      resolveVisualProcessingConfig({ VITE_VISUAL_PROC_STRENGTH: "1.0" }),
+    );
+
+    expect(tiers.map((t) => t.label)).toEqual(["full", "wasm-safe", "fallback"]);
+    expect(tiers[0].filter).toContain("geq=");
+    expect(tiers[1].filter).not.toContain("geq=");
+    expect(tiers[2].filter).toContain("noise=");
   });
 
   it("adds optional OCR-hostile overlay instances", () => {
@@ -70,16 +100,17 @@ describe("visual processing", () => {
 
     expect(filter).toContain("drawtext=");
     expect(filter).toContain("MY ASSET");
-    expect((filter!.match(/drawtext=/g) || []).length).toBeGreaterThanOrEqual(2);
+    expect((filter!.match(/drawtext=/g) || []).length).toBeGreaterThanOrEqual(3);
   });
 
-  it("provides a lighter fallback filter chain", () => {
+  it("provides a minimal fallback filter chain", () => {
     const fallback = buildVisualProcessingFallbackFilter(
       resolveVisualProcessingConfig({ VITE_VISUAL_PROC_STRENGTH: "1.0" }),
     );
 
     expect(fallback).toContain("eq=");
     expect(fallback).toContain("noise=");
+    expect(fallback).toContain("hue=");
     expect(fallback).not.toContain("lenscorrection=");
     expect(fallback).not.toContain("geq=");
   });

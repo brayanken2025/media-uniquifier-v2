@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ResultVideoPlayer from "./components/ResultVideoPlayer";
 import {
   processImageMedia,
   processMedia,
@@ -153,7 +154,6 @@ export default function App() {
     <div className="site">
       <main className={`container main ${showSetup ? "" : "main-focused"}`}>
         {showSetup && <div className="intro">
-          <span className="eyebrow">ESTÚDIO DE MÍDIA</span>
           <h1>Seu conteúdo, <span>seu controle.</span></h1>
           <p>Envie a mídia, configure o processamento e acompanhe cada etapa. Uma experiência profissional, diretamente no seu navegador.</p>
         </div>}
@@ -164,7 +164,7 @@ export default function App() {
               <h2>Prepare sua nova mídia</h2>
               <p>Escolha o arquivo, ajuste as opções e gere uma nova versão em poucos passos.</p>
             </div>
-            <div className="section-head"><div><span className="step">01</span><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
+            <div className="section-head"><div><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
             {!media ? (
               <label className={`drop ${dragging ? "dragging" : ""}`}
                 onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -188,7 +188,7 @@ export default function App() {
               </div>
             )}
             <div className="separator"/>
-            <div className="section-head"><div><span className="step">02</span><h2>Configure o processamento</h2></div></div>
+            <div className="section-head"><div><h2>Configure o processamento</h2></div></div>
             <label className={`option ${isImage ? "muted" : ""}`}>
               <span className="option-text"><strong>Camada visual</strong><small>Aplica ajustes visuais configurados durante a renderização.</small></span>
               <input type="checkbox" checked={visualLayer} disabled={working || isImage} onChange={e => setVisualLayer(e.target.checked)} />
@@ -203,7 +203,7 @@ export default function App() {
             <p className="support-text">Arquivos grandes podem demorar e exigem memória disponível no dispositivo. Não feche esta aba durante o processamento.</p>
           </section>}
           {showProgressPanel && <section className={working ? "processing-only" : "card right"} aria-live="polite" aria-label={working ? "Processamento em andamento" : "Resultado do processamento"}>
-            {!working && <div className="section-head"><div><span className="step">03</span><h2>{error ? "Status do processamento" : "Resultado"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>}
+            {!working && <div className="section-head"><div><h2>{error ? "Status do processamento" : "Seu vídeo ficou pronto"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>}
             {working ? (
               <div className="processing">
                 <div className="loader" aria-hidden="true"/>
@@ -214,10 +214,10 @@ export default function App() {
               <div className="empty"><span className="large-icon danger">!</span><h3>Não foi possível concluir</h3><p>{error}</p><button className="secondary" onClick={process} disabled={!media}>Tentar novamente</button></div>
             ) : output ? (
               <div className="result">
-                <div className="result-preview">{outputIsImage ? <img src={outputUrl} alt="Imagem processada" /> : <video src={outputUrl} controls playsInline preload="metadata" />}</div>
+                <div className="result-preview">{outputIsImage ? <img src={outputUrl} alt="Imagem processada" /> : <ResultVideoPlayer src={outputUrl} />}</div>
                 <div className="result-info"><strong>{output.fileName}</strong><small>{readableSize(output.blob.size)} · Gerado com sucesso</small></div>
                 <button className="primary" onClick={() => downloadBlob(output.blob, output.fileName)}>↓ Baixar arquivo</button>
-                <button className="secondary" onClick={() => downloadBlob(new Blob([JSON.stringify(output.diagnostics, null, 2)], {type:"application/json"}), `${output.fileName}.report.json`)}>↓ Baixar relatório de processamento (JSON)</button>
+                <button className="secondary" type="button" onClick={reset}>Criar novo vídeo</button>
                 <div className="diagnostics"><span>ID de processamento</span><code>{output.diagnostics.processingId}</code><span>SHA-256</span><code>{output.diagnostics.sha256}</code><span>Áudio original</span><strong>{output.diagnostics.originalAudioIncluded ? "Preservado" : "Não detectado"}</strong><span>Áudio adicional</span><strong>{output.diagnostics.secondaryAudioIncluded ? "Incluído" : "Não incluído"}</strong><span>Proveniência</span><strong>{output.diagnostics.provenanceStatus}</strong><span>Processamento visual</span><strong>{output.diagnostics.visualProcessingStatus}</strong></div>
               </div>
             ) : (

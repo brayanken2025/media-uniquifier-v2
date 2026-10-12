@@ -522,57 +522,112 @@ button:focus-visible,input:focus-visible,.drop:focus-within,.audio-option:focus-
 }
 
 
-/* Media Uniquifier — identidade azul Facebook #0047AA.
-   Apenas decoração e apresentação, sem alterar o pipeline de mídia. */
-:root { --fb-blue: #0047AA; --fb-blue-hover: #0e5fd0; }
-.site {
+/* Media Uniquifier — homepage Facebook #0047AA, visual-only redesign.
+   Keep media processing, player and result appearance untouched. */
+:root { --fb-blue: #0047AA; --fb-blue-hover: #0d64d9; }
+
+/* Bright, layered blues are limited to the homepage. */
+.site.site-home {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
   background:
-    radial-gradient(ellipse 62% 34% at 48% -12%, rgba(0,71,170,.32), transparent 80%),
-    linear-gradient(180deg,#071324 0%,#08172c 52%,#07111f 100%);
+    radial-gradient(ellipse 56% 38% at 52% -8%, rgba(35,135,255,.72), transparent 78%),
+    radial-gradient(ellipse 44% 67% at 0% 54%, rgba(1,109,246,.73), transparent 80%),
+    radial-gradient(ellipse 48% 68% at 100% 70%, rgba(1,109,246,.64), transparent 80%),
+    linear-gradient(116deg, #0047AA 0%, #0558c9 42%, #0047AA 74%, #035ac2 100%);
 }
-.intro h1 span { color: #8dc0ff; }
-.primary {
-  background: linear-gradient(115deg, var(--fb-blue), var(--fb-blue-hover));
-  box-shadow: 0 12px 30px rgba(0,71,170,.30);
-}
-.option input[type="checkbox"]:checked { background: var(--fb-blue); }
-.text-button { color: #8bbdff; }
-.drop:hover,.drop.dragging { border-color: #3476c7; }
-.upload-icon, .file-icon { background: rgba(0,71,170,.26); }
-.card { border-color: rgba(54,113,185,.31); }
-.workspace.workspace-initial { position: relative; isolation: isolate; }
-.workspace-initial > .card.left { position: relative; z-index: 1; }
-.home-zuck-decor {
+.site-home::before {
+  content: "";
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(235,247,255,.78) 1.05px, transparent 1.5px);
+  background-size: 19px 19px;
+  opacity: .50;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.9) 11%, transparent 27%, transparent 73%, rgba(0,0,0,.9) 90%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0%, rgba(0,0,0,.9) 11%, transparent 27%, transparent 73%, rgba(0,0,0,.9) 90%, #000 100%);
+}
+.site-home .main { position: relative; z-index: 1; }
+.site-home .intro h1 { text-shadow: 0 5px 25px rgba(0,20,68,.26); }
+.site-home .intro h1 span { color: #a5d2ff; }
+.site-home .intro p { color: #e5f2ff; text-shadow: 0 1px 12px rgba(0,27,89,.2); }
+.site-home .primary {
+  background: linear-gradient(112deg, #0768e5, var(--fb-blue) 72%, #0758c5);
+  box-shadow: 0 13px 30px rgba(0,45,123,.32);
+}
+.site-home .option input[type="checkbox"]:checked { background: var(--fb-blue); }
+.site-home .text-button { color: #a1d0ff; }
+.site-home .drop:hover, .site-home .drop.dragging { border-color: #58a8ff; }
+.site-home .upload-icon, .site-home .file-icon { background: rgba(0,71,170,.28); }
+.site-home .card {
+  border-color: rgba(102,169,255,.34);
+  box-shadow: 0 22px 75px rgba(0,24,79,.38), 0 0 0 1px rgba(255,255,255,.035) inset;
+}
+.site-home .footer { color: rgba(230,241,255,.8); }
+
+/* Both portraits stay in the free side gutters of the creation card.
+   The shoulder image ends within the composition; bottom alpha fading
+   avoids a hard straight cut at the original photograph's lower edge. */
+.site-home .workspace.workspace-initial { position: relative; isolation: isolate; }
+.site-home .workspace-initial > .card.left { position: relative; z-index: 2; }
+.site-home .home-zuck-decor {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   overflow: visible;
 }
-.home-zuck-decor img {
+.site-home .home-zuck-decor img {
   position: absolute;
   display: block;
+  max-width: none;
   height: auto;
   object-fit: contain;
-  user-select: none;
   pointer-events: none;
-  filter: drop-shadow(0 12px 24px rgba(0,0,0,.28));
+  user-select: none;
+  filter: drop-shadow(0 15px 24px rgba(0,28,91,.32));
 }
-.home-zuck-head {
-  width: clamp(170px, 17vw, 205px);
-  left: calc(50% - 570px);
-  top: -118px;
-  transform: rotate(-8deg);
-  opacity: .82;
+.site-home .home-zuck-head {
+  width: clamp(188px, 17vw, 226px);
+  left: calc(50% - 536px);
+  top: -112px;
+  transform: rotate(-7deg);
+  opacity: 1;
 }
-.home-zuck-shoulders {
-  width: clamp(175px, 20vw, 240px);
-  left: calc(50% - 602px);
-  bottom: -10px;
-  transform: rotate(-3deg);
-  opacity: .72;
+.site-home .home-zuck-shoulders {
+  width: clamp(215px, 19vw, 252px);
+  left: auto;
+  right: 4px;
+  bottom: 12px;
+  transform: rotate(3deg);
+  opacity: 1;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 79%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 79%, transparent 100%);
 }
-/* Em telas estreitas, não competir com o formulário nem criar rolagem lateral. */
-@media (max-width: 1100px) {
-  .home-zuck-decor { display: none; }
+
+/* Reduce portraits before the gutters become too narrow. */
+@media (max-width: 1190px) and (min-width: 901px) {
+  .site-home .home-zuck-head {
+    width: clamp(142px, 16vw, 188px);
+    left: 0;
+    top: -90px;
+  }
+  .site-home .home-zuck-shoulders {
+    width: clamp(150px, 17vw, 208px);
+    right: 0;
+    bottom: 22px;
+  }
+}
+@media (max-width: 900px) {
+  .site-home .home-zuck-decor { display: none; }
+}
+@media (max-width: 600px) {
+  .site.site-home {
+    background:
+      radial-gradient(ellipse 90% 35% at 52% 0%, rgba(29,135,255,.6), transparent 85%),
+      linear-gradient(180deg, #0457c2, #0047AA 58%, #05368a 100%);
+  }
+  .site-home::before { opacity: .2; }
 }

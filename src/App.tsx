@@ -47,6 +47,7 @@ export default function App() {
   const [dragging, setDragging] = useState(false);
   const isImage = Boolean(media?.type.startsWith("image/"));
   const outputIsImage = Boolean(output?.blob.type.startsWith("image/"));
+  const showProgressPanel = working || Boolean(error) || Boolean(output);
 
   useEffect(() => {
     if (!media) { setMediaUrl(""); return; }
@@ -125,11 +126,26 @@ export default function App() {
       <main className="container main">
         <div className="intro">
           <span className="eyebrow">ESTÚDIO DE MÍDIA</span>
-          <h1>Transforme sua mídia <span>com controle e qualidade.</span></h1>
-          <p>Envie um vídeo ou imagem, escolha as opções e gere uma nova versão. Seus arquivos são processados no navegador, sem envio a um servidor.</p>
+          <h1>Seu conteúdo, <span>seu controle.</span></h1>
+          <p>Envie a mídia, configure o processamento e acompanhe cada etapa. Uma experiência profissional, diretamente no seu navegador.</p>
+          <div className="hero-features" aria-label="Destaques da ferramenta">
+            <span>Vídeos e imagens</span>
+            <span>Processamento local</span>
+            <span>Download direto</span>
+          </div>
         </div>
-        <div className="workspace">
+        <div className={`workspace ${showProgressPanel ? "workspace-active" : "workspace-initial"}`}>
           <section className="card left" aria-label="Configuração do processamento">
+            <div className="setup-header">
+              <span className="setup-eyebrow">PAINEL DE CRIAÇÃO</span>
+              <h2>Prepare sua nova mídia</h2>
+              <p>Escolha o arquivo, ajuste as opções e gere uma nova versão em poucos passos.</p>
+            </div>
+            <div className="setup-guide" aria-label="Como utilizar">
+              <span><b>01</b> Envie</span>
+              <span><b>02</b> Configure</span>
+              <span><b>03</b> Processe</span>
+            </div>
             <div className="section-head"><div><span className="step">01</span><h2>Arquivo original</h2></div>{media && !working && <button className="text-button" onClick={reset}>Trocar arquivo</button>}</div>
             {!media ? (
               <label className={`drop ${dragging ? "dragging" : ""}`}
@@ -137,9 +153,9 @@ export default function App() {
                 onDragLeave={(e) => { e.preventDefault(); setDragging(false); }}
                 onDrop={(e) => { e.preventDefault(); setDragging(false); chooseFile(e.dataTransfer.files?.[0]); }}>
                 <span className="upload-icon">↑</span>
-                <strong>Arraste sua mídia até aqui</strong>
-                <span>ou clique para selecionar um arquivo</span>
-                <small>MP4, MOV, WebM, PNG, JPG e outros formatos compatíveis</small>
+                <strong>Envie seu vídeo ou imagem</strong>
+                <span>Arraste o arquivo para cá ou clique para selecioná-lo.</span>
+                <small>Compatível com MP4, MOV, WebM, PNG, JPG e formatos aceitos pelo navegador.</small>
                 <input type="file" accept="video/*,image/*" onChange={(e) => { chooseFile(e.target.files?.[0]); e.currentTarget.value = ""; }} />
               </label>
             ) : (
@@ -151,7 +167,7 @@ export default function App() {
               </div>
             )}
             <div className="separator"/>
-            <div className="section-head"><div><span className="step">02</span><h2>Personalize o processamento</h2></div></div>
+            <div className="section-head"><div><span className="step">02</span><h2>Configure o processamento</h2></div></div>
             <label className={`option ${isImage ? "muted" : ""}`}>
               <span className="option-text"><strong>Camada visual</strong><small>Aplica ajustes visuais configurados durante a renderização.</small></span>
               <input type="checkbox" checked={visualLayer} disabled={working || isImage} onChange={e => setVisualLayer(e.target.checked)} />
@@ -165,10 +181,24 @@ export default function App() {
             <button className="primary" type="button" disabled={!media || working} onClick={process}>{working ? "Processando mídia…" : "Gerar nova mídia"} <span>{working ? "◌" : "→"}</span></button>
             <p className="support-text">Arquivos grandes podem demorar e exigem memória disponível no dispositivo. Não feche esta aba durante o processamento.</p>
           </section>
-          <section className="card right" aria-live="polite" aria-label="Resultado">
-            <div className="section-head"><div><span className="step">03</span><h2>Resultado</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>
+          {showProgressPanel && <section className="card right" aria-live="polite" aria-label="Acompanhamento e resultado">
+            <div className="section-head"><div><span className="step">03</span><h2>{working ? "Acompanhamento" : error ? "Status do processamento" : "Resultado"}</h2></div>{output && <span className="done-tag">✓ Concluído</span>}</div>
             {working ? (
-              <div className="processing"><div className="loader"/><h3>{labels[stage]}</h3><p>Aguarde enquanto a mídia é preparada.</p><div className="meter"><div style={{width: `${Math.round(progress * 100)}%`}}/></div><strong>{Math.round(progress * 100)}%</strong></div>
+              <div className="processing">
+                  <div className="loader" aria-hidden="true"/>
+                  <span className="processing-label">PROCESSAMENTO EM ANDAMENTO</span>
+                  <h3>{labels[stage]}</h3>
+                  <p>Estamos preparando seu arquivo no navegador. Você pode acompanhar o progresso abaixo.</p>
+                  <div className="progress-heading"><span>Progresso da tarefa</span><strong>{Math.round(progress * 100)}%</strong></div>
+                  <div className="meter" role="progressbar" aria-label="Progresso do processamento" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}><div style={{width: `${Math.round(progress * 100)}%`}}/></div>
+                  <div className="processing-steps" aria-label="Etapas da tarefa">
+                    <span className={stage === "preparing" ? "is-current" : ""}>Preparação</span>
+                    <span className={stage === "loading-engine" ? "is-current" : ""}>Carregamento</span>
+                    <span className={stage === "writing-files" ? "is-current" : ""}>Organização</span>
+                    <span className={stage === "encoding" ? "is-current" : ""}>Renderização</span>
+                  </div>
+                  <small className="processing-note">Não feche a página até que o processamento termine.</small>
+                </div>
             ) : error ? (
               <div className="empty"><span className="large-icon danger">!</span><h3>Não foi possível concluir</h3><p>{error}</p><button className="secondary" onClick={process} disabled={!media}>Tentar novamente</button></div>
             ) : output ? (
@@ -182,7 +212,7 @@ export default function App() {
             ) : (
               <div className="empty"><span className="large-icon">▷</span><h3>Seu resultado aparecerá aqui</h3><p>Selecione um arquivo, configure as opções e comece o processamento.</p><div className="empty-lines"><span/><span/><span/></div></div>
             )}
-          </section>
+          </section>}
         </div>
         <footer className="footer">MEDIA UNIQUIFIER · Processamento de mídia no dispositivo · Nenhum arquivo enviado ao servidor</footer>
       </main>
